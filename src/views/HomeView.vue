@@ -51,7 +51,12 @@ const setSquareValue = (index: number) => {
   <main>
     <section class="min-h-screen flex flex-col items-center justify-center px-10">
       <h1 class="text-4xl mb-4">
-        Player turn : <span :style="{ color: activePlayer?.color }">{{ activePlayer?.name }}</span>
+        <span v-if="!isGameOver"> Current Player: </span>
+
+        <span :style="{ color: activePlayer?.color }"
+          >{{ activePlayer?.name }}({{ activePlayer?.symbol }})</span
+        >
+        <span v-if="isGameOver"> Won 🎉</span>
       </h1>
       <div class="board">
         <BoardSquare
