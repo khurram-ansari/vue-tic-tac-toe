@@ -1,12 +1,13 @@
 <template>
-  <div class="square">
-    {{ value }}
-  </div>
+  <button class="square" :style="{ color: color }">
+    {{ symbol }}
+  </button>
 </template>
 
 <script setup lang="ts">
 const props = defineProps<{
-  value?: string
+  symbol?: string
+  color?: string
 }>()
 </script>
 
