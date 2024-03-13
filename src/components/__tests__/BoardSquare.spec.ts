@@ -5,7 +5,7 @@ import BoardSquare from '../BoardSquare.vue'
 
 describe('BoardSquare', () => {
   it('renders properly', () => {
-    const wrapper = mount(BoardSquare, { props: { value: 'Hello world' } })
-    expect(wrapper.text()).toContain('Hello world')
+    const wrapper = mount(BoardSquare, { props: { symbol: '%' } })
+    expect(wrapper.text()).toContain('%')
   })
 })
