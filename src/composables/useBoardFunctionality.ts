@@ -1,14 +1,10 @@
 import type { Player } from '@/types'
 import { computed, ref, type Ref } from 'vue'
 
-export const useBoardFunctionality = (players: Player[]) => {
+export const useBoardFunctionality = (activePlayer: Ref<Player>) => {
   const squares: Ref<any[]> = ref(Array(9).fill(null))
 
-  const activePlayerIndex: Ref<number> = ref(0)
-
   const winningResult: Ref<number[]> = ref([])
-
-  const activePlayer = computed(() => players[activePlayerIndex.value])
 
   const gameStatus = computed(() => {
     const allMovesDone = squares.value.every((square) => square?.symbol)
@@ -26,9 +22,6 @@ export const useBoardFunctionality = (players: Player[]) => {
     return dir ? `${prefix}${dir}` : ''
   })
 
-  const changeTurn = () => {
-    activePlayerIndex.value = (activePlayerIndex.value + 1) % players.length
-  }
   const checkWin = () => {
     const winningCombinations = [
       [0, 1, 2],
@@ -43,7 +36,7 @@ export const useBoardFunctionality = (players: Player[]) => {
 
     const winningCombination = winningCombinations.find((combination) => {
       return combination.every(
-        (index) => squares.value[index]?.symbol === activePlayer.value.symbol
+        (index) => squares.value[index]?.symbol === activePlayer.value?.symbol
       )
     })
 
@@ -52,12 +45,17 @@ export const useBoardFunctionality = (players: Player[]) => {
 
   const setSquareValue = (index: number) => {
     if (!squares.value[index] && gameStatus.value === 'ONGOING') {
-      squares.value[index] = { symbol: activePlayer.value.symbol, color: activePlayer.value.color }
+      console.log(activePlayer)
+
+      squares.value[index] = {
+        symbol: activePlayer.value?.symbol,
+        color: activePlayer.value?.color
+      }
 
       const result = checkWin()
       if (result) {
         winningResult.value = result
-      } else changeTurn()
+      }
     }
   }
 
@@ -66,6 +64,8 @@ export const useBoardFunctionality = (players: Player[]) => {
     activePlayer,
     gameStatus,
     winningStrikeClass,
-    setSquareValue
+    setSquareValue,
+    checkWin,
+    winningResult
   }
 }
