@@ -12,11 +12,20 @@ const players: Ref<Player[]> = ref([
 
 const activePlayerIndex: Ref<number> = ref(0)
 
-const isGameOver: Ref<boolean> = ref(false)
-
-const winningResult: Ref<any> = ref(null)
+const winningResult: Ref<number[]> = ref([])
 
 const activePlayer = computed(() => players.value[activePlayerIndex.value])
+
+const gameStatus = computed(() => {
+  const allMovesDone = squares.value.every((square) => square?.symbol)
+
+  if (winningResult.value.length) return 'WIN'
+
+  if (allMovesDone && !winningResult.value.length) return 'TIED'
+
+  return 'ONGOING'
+})
+
 const winningStrikeClass = computed(() => {
   const prefix = 'dir-'
   const dir = winningResult.value?.join('')
@@ -46,12 +55,11 @@ const checkWin = () => {
 }
 
 const setSquareValue = (index: number) => {
-  if (!squares.value[index] && isGameOver.value === false) {
+  if (!squares.value[index] && gameStatus.value === 'ONGOING') {
     squares.value[index] = { symbol: activePlayer.value.symbol, color: activePlayer.value.color }
 
     const result = checkWin()
     if (result) {
-      isGameOver.value = true
       winningResult.value = result
     } else changeTurn()
   }
@@ -62,12 +70,15 @@ const setSquareValue = (index: number) => {
   <main>
     <section class="min-h-screen flex flex-col items-center justify-center px-10">
       <h1 class="text-4xl mb-4">
-        <span v-if="!isGameOver"> Current Player: </span>
+        <template v-if="gameStatus === 'ONGOING'"> Current Player: </template>
 
-        <span :style="{ color: activePlayer?.color }"
+        <template v-else-if="gameStatus === 'WIN'"> Winner 🎉: </template>
+
+        <template v-else> Game is Tied </template>
+
+        <span v-if="gameStatus !== 'TIED'" :style="{ color: activePlayer?.color }"
           >{{ activePlayer?.name }}({{ activePlayer?.symbol }})</span
         >
-        <span v-if="isGameOver"> Won 🎉</span>
       </h1>
       <div class="board relative">
         <BoardSquare
@@ -78,7 +89,7 @@ const setSquareValue = (index: number) => {
           :key="index"
         />
         <div
-          v-if="winningResult"
+          v-if="gameStatus === 'WIN'"
           class="strike h-full w-1 absolute bg-green-500"
           :class="[winningStrikeClass]"
         ></div>
